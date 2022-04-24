@@ -1,14 +1,14 @@
 const fs = require("fs");
-const rcn = require("./config.json");
+const romconfig = require("./config/ROMCONFIG.json");
 const dropboxV2Api = require('dropbox-v2-api');
-let rcnaccess = require("./bruh.json");
+let accessconfig = require("./config/ACCESSCONFIG.json");
 
 const dropbox = dropboxV2Api.authenticate({
-    token: rcnaccess.access_token
+    token: accessconfig.access_token
 });
 
 let pickednickname = process.argv.splice(2).toString();
-let pickedrom = rcn.roms.find(o => o.nickname === pickednickname);
+let pickedrom = romconfig.roms.find(o => o.nickname === pickednickname);
 console.log(pickedrom)
 
 dropbox({
@@ -19,11 +19,8 @@ dropbox({
 }, (err, result, response) => {
     if(err){ return console.log(err); }
     const datedelta = new Date(result.client_modified);
-    console.log(result);
-    console.log("Delta time: "+datedelta.getTime())
     fs.stat(`./roms/${pickedrom.romname}.sav`, function(err, stats){
         var mtime = stats.mtime;
-        console.log("Local time: "+mtime.getTime());
         if (datedelta.getTime()>mtime.getTime()) {
             console.log("Your save file is not up to date. Downloading from dropbox now...")
             dropbox({
