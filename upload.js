@@ -1,13 +1,15 @@
-const fs =require("fs");
-const rcn = require("./config.json");
+const fs = require("fs");
+const romconfig = require("./config/ROMCONFIG.json");
 const dropboxV2Api = require('dropbox-v2-api');
+let accessconfig = require("./config/ACCESSCONFIG.json");
+
 const dropbox = dropboxV2Api.authenticate({
-    token: rcn.accesstoken
+    token: accessconfig.access_token
 });
 
-//const rom1savefilepath = `./roms/${rcn.roms["prosecutors path"].filename}.sav`;
 let pickednickname = process.argv.splice(2).toString();
-let pickedrom = rcn.roms.find(o => o.nickname === pickednickname);
+let pickedrom = romconfig.roms.find(o => o.nickname === pickednickname);
+console.log("Don't close this terminal window as long as you continue to play.")
 console.log(pickedrom)
 
 fs.watchFile(`./roms/${pickedrom.romname}.sav`, (curr, prev) => { //check if local save file has changed
