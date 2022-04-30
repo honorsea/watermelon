@@ -5,9 +5,8 @@ const dropboxV2Api = require('dropbox-v2-api');
 const Hapi = require('hapi');
 const fs = require('fs');
 const Opn = require('opn');
-const authconfig = require('./config/AUTHCONFIG.json');
+const authconfig = require(process.cwd()+'./AUTHCONFIG.json');
 
-//set auth credentials
 const dropbox = dropboxV2Api.authenticate({
 	client_id: authconfig.appKey,
 	client_secret: 	authconfig.appSecret,
@@ -21,7 +20,6 @@ var obj = {
     "refreshToken":""
 };
 
-//prepare server & oauth2 response callback
 (async () => {
 	const server = Hapi.server({
 		port: 4000,
@@ -35,12 +33,12 @@ var obj = {
 			var params = request.query;
 
 			return new Promise((resolve) => {
+                resolve('You can close this browser window now and return to terminal.')
 				dropbox.getToken(params.code, function (err, response) {
-					console.log(err);
-					console.log('user\'s refresh_token: ', response.refresh_token);
+					console.log('Authentication complete. ');
 					obj.refreshToken = response.refresh_token
-					fs.writeFileSync("./config/AUTHCONFIG.json", JSON.stringify(obj));
-
+					fs.writeFileSync(process.cwd()+"/AUTHCONFIG.json", JSON.stringify(obj));
+                    process.exit();
 				});
 			})
 		}
@@ -48,5 +46,5 @@ var obj = {
 
 	await server.start();
 	Opn(dropbox.generateAuthUrl());
-	console.log('Server running on %s', server.info.uri);
+	console.log('Refresh token not found. Please authorise with your Dropbox account:');
 })()
