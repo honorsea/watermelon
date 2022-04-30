@@ -1,4 +1,4 @@
-const fs =require("fs");
+const fs = require("fs");
 const process = require('process');
 const rl = require('readline').createInterface({
     input: process.stdin,
